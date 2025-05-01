@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PostCraft - LinkedIn Post Generator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0A66C2;
+            --primary-light: #E8F0F8;
+            --secondary: #666666;
+            --light-gray: #F5F5F5;
+            --white: #FFFFFF;
+            --success: #2E7D32;
+            --warning: #ED6C02;
+            --error: #D32F2F;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            background-color: var(--light-gray);
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            margin-bottom: 30px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        .logo-icon {
+            font-size: 28px;
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 20px;
+        }
+        
+        nav a {
+            text-decoration: none;
+            color: var(--secondary);
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        
+        nav a:hover {
+            color: var(--primary);
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .input-section, .output-section {
+            background-color: var(--white);
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+        
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .section-title i {
+            font-size: 24px;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--secondary);
+        }
+        
+        input[type="text"], textarea, select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 16px;
+            transition: border 0.3s;
+        }
+        
+        input[type="text"]:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        textarea {
+            min-height: 200px;
+            resize: vertical;
+        }
+        
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .option-card {
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+        
+        .option-card:hover {
+            border-color: var(--primary);
+        }
+        
+        .option-card.selected {
+            background-color: var(--primary-light);
+            border-color: var(--primary);
+        }
+        
+        .option-card i {
+            font-size: 24px;
+            margin-bottom: 8px;
+            display: block;
+        }
+        
+        .option-card .option-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .option-card .option-desc {
+            font-size: 12px;
+            color: var(--secondary);
+        }
+        
+        .btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn:hover {
+            background-color: #084B8A;
+        }
+        
+        .btn-secondary {
+            background-color: var(--white);
+            color: var(--primary);
+            border: 1px solid var(--primary);
+        }
+        
+        .btn-secondary:hover {
+            background-color: var(--primary-light);
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .post-meta {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            font-size: 14px;
+            color: var(--secondary);
+        }
+        
+        .char-count {
+            font-weight: 600;
+        }
+        
+        .char-count.good {
+            color: var(--success);
+        }
+        
+        .char-count.warning {
+            color: var(--warning);
+        }
+        
+        .char-count.error {
+            color: var(--error);
+        }
+        
+        .hashtags {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px dashed #ddd;
+        }
+        
+        .hashtag {
+            display: inline-block;
+            background-color: var(--primary-light);
+            color: var(--primary);
+            padding: 4px 10px;
+            border-radius: 20px;
+            margin-right: 8px;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: var(--white);
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        footer {
+            text-align: center;
+            padding: 30px 0;
+            color: var(--secondary);
+            font-size: 14px;
+            margin-top: 50px;
+            border-top: 1px solid #eee;
+        }
+        
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <span class="logo-icon">📝</span>
+                <span>PostCraft</span>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="#">Home</a></li>
+                    <li><a href="#">Templates</a></li>
+                    <li><a href="#">About</a></li>
+                </ul>
+            </nav>
+        </header>
+        
+        <main>
+            <div class="main-content">
+                <div class="input-section">
+                    <h2 class="section-title"><i>✏️</i> Craft Your Post</h2>
+                    
+                    <div class="input-group">
+                        <label for="post-topic">What's your post about?</label>
+                        <input type="text" id="post-topic" placeholder="e.g., AI in marketing, career growth tips...">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>Post Length</label>
+                        <div class="options-grid">
+                            <div class="option-card selected" data-length="short">
+                                <i>🔹</i>
+                                <div class="option-title">Short</div>
+                                <div class="option-desc">130-300 chars</div>
+                            </div>
+                            <div class="option-card" data-length="medium">
+                                <i>🔸</i>
+                                <div class="option-title">Medium</div>
+                                <div class="option-desc">300-600 chars</div>
+                            </div>
+                            <div class="option-card" data-length="long">
+                                <i>🔺</i>
+                                <div class="option-title">Long</div>
+                                <div class="option-desc">600-1300 chars</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>Tone</label>
+                        <div class="options-grid">
+                            <div class="option-card selected" data-tone="professional">
+                                <i>👔</i>
+                                <div class="option-title">Professional</div>
+                            </div>
+                            <div class="option-card" data-tone="friendly">
+                                <i>😊</i>
+                                <div class="option-title">Friendly</div>
+                            </div>
+                            <div class="option-card" data-tone="inspirational">
+                                <i>💡</i>
+                                <div class="option-title">Inspirational</div>
+                            </div>
+                            <div class="option-card" data-tone="bold">
+                                <i>🔥</i>
+                                <div class="option-title">Bold</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="additional-instructions">Additional Instructions (Optional)</label>
+                        <input type="text" id="additional-instructions" placeholder="e.g., include statistics, make it controversial...">
+                    </div>
+                    
+                    <button id="generate-btn" class="btn">
+                        <span id="generate-text">Generate Post</span>
+                        <span id="generate-loader" class="loading hidden"></span>
+                    </button>
+                </div>
+                
+                <div class="output-section">
+                    <h2 class="section-title"><i>✨</i> Your LinkedIn Post</h2>
+                    <div id="post-output" class="output-placeholder">
+                        <p style="color: #999;">Your generated post will appear here...</p>
+                    </div>
+                    
+                    <div class="post-meta">
+                        <div>
+                            <span>Characters: </span>
+                            <span id="char-count" class="char-count">0</span>
+                        </div>
+                        <div>
+                            <span id="length-status"></span>
+                        </div>
+                    </div>
+                    
+                    <div id="hashtags-container" class="hashtags hidden">
+                        <h4>Suggested Hashtags</h4>
+                        <div id="hashtags-list"></div>
+                    </div>
+                    
+                    <div class="action-buttons">
+                        <button id="copy-btn" class="btn btn-secondary">
+                            <i>📋</i> Copy Text
+                        </button>
+                        <button id="new-hashtags-btn" class="btn btn-secondary">
+                            <i>#️⃣</i> New Hashtags
+                        </button>
+                        <button id="regenerate-btn" class="btn btn-secondary">
+                            <i>🔄</i> Regenerate
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+        
+        <footer>
+            <p>PostCraft - Free LinkedIn Post Generator | No login required | 100% free</p>
+        </footer>
+    </div>
+
+    <script>
+        // Configuration
+        const config = {
+            length: 'short',
+            tone: 'professional',
+            lastPrompt: '',
+            lastGeneratedPost: ''
+        };
+        
+        // DOM Elements
+        const lengthCards = document.querySelectorAll('[data-length]');
+        const toneCards = document.querySelectorAll('[data-tone]');
+        const generateBtn = document.getElementById('generate-btn');
+        const generateText = document.getElementById('generate-text');
+        const generateLoader = document.getElementById('generate-loader');
+        const postOutput = document.getElementById('post-output');
+        const charCount = document.getElementById('char-count');
+        const lengthStatus = document.getElementById('length-status');
+        const hashtagsContainer = document.getElementById('hashtags-container');
+        const hashtagsList = document.getElementById('hashtags-list');
+        const copyBtn = document.getElementById('copy-btn');
+        const newHashtagsBtn = document.getElementById('new-hashtags-btn');
+        const regenerateBtn = document.getElementById('regenerate-btn');
+        
+        // Event Listeners
+        lengthCards.forEach(card => {
+            card.addEventListener('click', () => {
+                lengthCards.forEach(c => c.classList.remove('selected'));
+                card.classList.add('selected');
+                config.length = card.dataset.length;
+            });
+        });
+        
+        toneCards.forEach(card => {
+            card.addEventListener('click', () => {
+                toneCards.forEach(c => c.classList.remove('selected'));
+                card.classList.add('selected');
+                config.tone = card.dataset.tone;
+            });
+        });
+        
+        generateBtn.addEventListener('click', generatePost);
+        copyBtn.addEventListener('click', copyToClipboard);
+        newHashtagsBtn.addEventListener('click', generateHashtags);
+        regenerateBtn.addEventListener('click', regeneratePost);
+        
+        // Functions
+        function generatePost() {
+            const topic = document.getElementById('post-topic').value.trim();
+            if (!topic) {
+                alert('Please enter a topic for your post');
+                return;
+            }
+            
+            // Show loading state
+            generateText.classList.add('hidden');
+            generateLoader.classList.remove('hidden');
+            generateBtn.disabled = true;
+            
+            // Simulate API call (replace with actual API call)
+            setTimeout(() => {
+                // This is where you would call the actual API
+                // For now, we'll simulate a response
+                const mockPosts = {
+                    short: `🚀 Just discovered an amazing productivity hack! 
+
+Switching to the Pomodoro technique has increased my daily output by 40%. 
+
+What's your favorite productivity method? 
+
+#Productivity #TimeManagement #WorkSmart`,
+                    
+                    medium: `🤖 AI is transforming marketing faster than we realize...
+
+In the past year alone:
+- AI content tools grew 300% in adoption
+- Personalization improved conversion by 25%
+- Campaign analysis time reduced by 60%
+
+But here's the catch - the human touch still matters most. The best campaigns blend AI efficiency with human creativity. 
+
+How are you balancing AI and human input in your marketing? 
+
+#DigitalMarketing #AI #MarketingTech #FutureOfWork`,
+                    
+                    long: `💼 My career-changing moment came when I least expected it...
+
+Two years ago, I was stuck in a role that didn't challenge me. I was comfortable but unfulfilled. Then I made three changes that transformed my professional life:
+
+1. Started dedicating 1 hour daily to learning (podcasts, courses, articles)
+2. Built a personal brand by sharing insights online
+3. Networked intentionally - not just collecting contacts but building relationships
+
+The results? 
+- Promoted within 6 months
+- 5x more LinkedIn opportunities
+- Genuine satisfaction in my work
+
+The lesson? Growth happens outside your comfort zone. 
+
+What's one step you can take today to push your career forward? 
+
+#CareerGrowth #ProfessionalDevelopment #Networking #PersonalBrand`
+                };
+                
+                config.lastGeneratedPost = mockPosts[config.length];
+                displayPost(config.lastGeneratedPost);
+                
+                // Hide loading state
+                generateText.classList.remove('hidden');
+                generateLoader.classList.add('hidden');
+                generateBtn.disabled = false;
+                
+                // Generate hashtags
+                generateHashtags();
+            }, 1500);
+        }
+        
+        function displayPost(post) {
+            postOutput.innerHTML = post;
+            updateCharCount(post.length);
+        }
+        
+        function updateCharCount(count) {
+            charCount.textContent = count;
+            
+            const lengthLimits = {
+                short: { min: 130, max: 300 },
+                medium: { min: 300, max: 600 },
+                long: { min: 600, max: 1300 }
+            };
+            
+            const limits = lengthLimits[config.length];
+            
+            if (count < limits.min) {
+                lengthStatus.textContent = 'Too short';
+                charCount.className = 'char-count error';
+            } else if (count > limits.max) {
+                lengthStatus.textContent = 'Too long';
+                charCount.className = 'char-count warning';
+            } else {
+                lengthStatus.textContent = 'Perfect length';
+                charCount.className = 'char-count good';
+            }
+        }
+        
+        function generateHashtags() {
+            // Simulate hashtag generation
+            const mockHashtags = {
+                short: ['#Productivity', '#TimeManagement', '#WorkSmart'],
+                medium: ['#DigitalMarketing', '#AI', '#MarketingTech', '#FutureOfWork'],
+                long: ['#CareerGrowth', '#ProfessionalDevelopment', '#Networking', '#PersonalBrand', '#Success']
+            };
+            
+            hashtagsList.innerHTML = '';
+            mockHashtags[config.length].forEach(tag => {
+                const span = document.createElement('span');
+                span.className = 'hashtag';
+                span.textContent = tag;
+                hashtagsList.appendChild(span);
+            });
+            
+            hashtagsContainer.classList.remove('hidden');
+        }
+        
+        function copyToClipboard() {
+            if (!config.lastGeneratedPost) {
+                alert('Generate a post first');
+                return;
+            }
+            
+            navigator.clipboard.writeText(config.lastGeneratedPost)
+                .then(() => {
+                    copyBtn.innerHTML = '<i>✓</i> Copied!';
+                    setTimeout(() => {
+                        copyBtn.innerHTML = '<i>📋</i> Copy Text';
+                    }, 2000);
+                })
+                .catch(() => alert('Failed to copy text'));
+        }
+        
+        function regeneratePost() {
+            if (!config.lastGeneratedPost) {
+                alert('Generate a post first');
+                return;
+            }
+            generatePost();
+        }
+    </script>
+</body>
+</html>
